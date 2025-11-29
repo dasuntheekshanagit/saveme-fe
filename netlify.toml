@@ -1,0 +1,9 @@
+# Netlify configuration file
+
+[build]
+  # This section tells Netlify's secret scanner that it is safe
+  # for these specific environment variables to be present in the
+  # final build output. Create React App requires this for them to be
+  # accessible in the frontend code.
+  [build.processing.secrets]
+    omit_keys = ["REACT_APP_BACKEND_URL", "REACT_APP_GOOGLE_MAPS_API_KEY"]
