@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api from '../api/api';
 
 const AddAlertModal = ({ closeModal, locationFromMap }) => {
   const [formData, setFormData] = useState({
@@ -74,18 +75,9 @@ const AddAlertModal = ({ closeModal, locationFromMap }) => {
     });
 
     try {
-      const response = await fetch('/api/notifications', {
-        method: 'POST',
-        body: submission,
-      });
-
-      if (response.ok) {
-        alert('Notification submitted successfully!');
-        closeModal();
-      } else {
-        const error = await response.json();
-        alert(`Submission failed: ${error.message}`);
-      }
+      await api.postMultipart('/api/notifications', submission);
+      alert('Notification submitted successfully!');
+      closeModal();
     } catch (error) {
       console.error('Error submitting notification:', error);
       alert('An error occurred while submitting the notification.');

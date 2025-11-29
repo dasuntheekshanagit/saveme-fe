@@ -4,6 +4,8 @@ import AddAlertModal from '../components/AddAlertModal';
 import RequestFoodModal from '../components/RequestFoodModal';
 import HighSeverityPanel from '../components/HighSeverityPanel';
 import MapLegend from '../components/MapLegend';
+import ActionChoiceModal from '../components/ActionChoiceModal';
+import api from '../api/api';
 
 const containerStyle = {
   width: '100%',
@@ -37,14 +39,14 @@ const HomePage = () => {
   const [openNotifications, setOpenNotifications] = useState([]);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const [isFoodModalOpen, setIsFoodModalOpen] = useState(false);
+  const [isChoiceModalOpen, setIsChoiceModalOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [activeMarker, setActiveMarker] = useState(null);
   const autocompleteRef = useRef(null);
 
   const fetchNotifications = useCallback(async () => {
     try {
-        const response = await fetch('/api/notifications');
-        const data = await response.json();
+        const data = await api.get('/api/notifications');
         setAllNotifications(data);
         setOpenNotifications(data.filter(n => n.open));
     } catch (error) {
@@ -60,15 +62,24 @@ const HomePage = () => {
     setActiveMarker(null);
     const location = { lat: event.latLng.lat(), lng: event.latLng.lng() };
     setSelectedLocation(location);
-    // For simplicity, we'll open the main alert modal. A more advanced UI could ask the user which they want to create.
-    setIsAlertModalOpen(true);
+    setIsChoiceModalOpen(true);
   }, []);
 
-  const closeModals = () => {
+  const closeAllModals = () => {
     setIsAlertModalOpen(false);
     setIsFoodModalOpen(false);
+    setIsChoiceModalOpen(false);
     setSelectedLocation(null);
     fetchNotifications();
+  };
+
+  const handleChoice = (choice) => {
+    setIsChoiceModalOpen(false);
+    if (choice === 'alert') {
+      setIsAlertModalOpen(true);
+    } else if (choice === 'food') {
+      setIsFoodModalOpen(true);
+    }
   };
 
   const onPlaceChanged = () => {
@@ -140,16 +151,17 @@ const HomePage = () => {
       ) : <p>Loading map...</p>}
 
       <div className="absolute bottom-10 right-4 md:right-10 flex flex-col space-y-2 z-10">
-        <button onClick={() => setIsFoodModalOpen(true)} className="bg-green-600 text-white rounded-full p-4 shadow-lg hover:bg-green-700">
+        <button onClick={() => { setSelectedLocation(null); setIsFoodModalOpen(true); }} className="bg-green-600 text-white rounded-full p-4 shadow-lg hover:bg-green-700">
             Request Food
         </button>
-        <button onClick={() => setIsAlertModalOpen(true)} className="bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700">
+        <button onClick={() => { setSelectedLocation(null); setIsAlertModalOpen(true); }} className="bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700">
             Add Alert
         </button>
       </div>
 
-      {isAlertModalOpen && <AddAlertModal closeModal={closeModals} locationFromMap={selectedLocation} />}
-      {isFoodModalOpen && <RequestFoodModal closeModal={closeModals} locationFromMap={selectedLocation} />}
+      {isChoiceModalOpen && <ActionChoiceModal onChoose={handleChoice} onCancel={closeAllModals} />}
+      {isAlertModalOpen && <AddAlertModal closeModal={closeAllModals} locationFromMap={selectedLocation} />}
+      {isFoodModalOpen && <RequestFoodModal closeModal={closeAllModals} locationFromMap={selectedLocation} />}
     </div>
   );
 };

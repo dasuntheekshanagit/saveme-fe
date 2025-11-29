@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import AcknowledgeModal from '../components/AcknowledgeModal';
 import SummaryHighlights from '../components/SummaryHighlights';
 import FilterBar from '../components/FilterBar';
+import api from '../api/api';
 
 const AlertsPage = () => {
   const [allNotifications, setAllNotifications] = useState([]);
@@ -14,8 +15,7 @@ const AlertsPage = () => {
 
   const fetchNotifications = useCallback(async () => {
     try {
-        const response = await fetch('/api/notifications');
-        const data = await response.json();
+        const data = await api.get('/api/notifications');
         setAllNotifications(data.filter(n => n.open));
     } catch (error) {
         console.error("Failed to fetch notifications:", error);

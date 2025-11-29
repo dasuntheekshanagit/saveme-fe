@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api from '../api/api';
 
 const RequestFoodModal = ({ closeModal, locationFromMap }) => {
   const [formData, setFormData] = useState({
@@ -10,7 +11,7 @@ const RequestFoodModal = ({ closeModal, locationFromMap }) => {
     affectedPeople: '',
     comments: '',
     type: 'food_request',
-    severity: 'LOW', // Default severity for food requests
+    severity: 'LOW',
   });
 
   useEffect(() => {
@@ -22,6 +23,23 @@ const RequestFoodModal = ({ closeModal, locationFromMap }) => {
       }));
     }
   }, [locationFromMap]);
+
+  const handleUseMyLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setFormData(prev => ({
+            ...prev,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          }));
+        },
+        (error) => alert(`Error: ${error.message}`)
+      );
+    } else {
+      alert('Geolocation is not supported by this browser.');
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,18 +57,9 @@ const RequestFoodModal = ({ closeModal, locationFromMap }) => {
     submission.append('notification', new Blob([JSON.stringify(submissionData)], { type: 'application/json' }));
 
     try {
-      const response = await fetch('/api/notifications', {
-        method: 'POST',
-        body: submission,
-      });
-
-      if (response.ok) {
-        alert('Food request submitted successfully!');
-        closeModal();
-      } else {
-        const error = await response.json();
-        alert(`Submission failed: ${error.message}`);
-      }
+      await api.postMultipart('/api/notifications', submission);
+      alert('Food request submitted successfully!');
+      closeModal();
     } catch (error) {
       console.error('Error submitting request:', error);
       alert('An error occurred while submitting the request.');
@@ -62,6 +71,11 @@ const RequestFoodModal = ({ closeModal, locationFromMap }) => {
       <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-lg">
         <h2 className="text-2xl font-bold mb-4">Request Food Supplies</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <input type="number" step="any" name="latitude" value={formData.latitude} onChange={handleChange} placeholder="Latitude" className="w-full p-2 border rounded" required />
+            <input type="number" step="any" name="longitude" value={formData.longitude} onChange={handleChange} placeholder="Longitude" className="w-full p-2 border rounded" required />
+          </div>
+          <button type="button" onClick={handleUseMyLocation} className="w-full p-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Use My Location</button>
           <input type="text" name="location" value={formData.location} onChange={handleChange} placeholder="Location Description" className="w-full p-2 border rounded" required />
           <input type="number" name="affectedPeople" value={formData.affectedPeople} onChange={handleChange} placeholder="Number of People Needing Food" className="w-full p-2 border rounded" required />
           <input type="text" name="reporterName" value={formData.reporterName} onChange={handleChange} placeholder="Your Name" className="w-full p-2 border rounded" required />

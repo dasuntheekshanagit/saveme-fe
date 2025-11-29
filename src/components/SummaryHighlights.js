@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api from '../api/api';
 
 const SummaryHighlights = () => {
     const [summary, setSummary] = useState(null);
@@ -6,8 +7,7 @@ const SummaryHighlights = () => {
     useEffect(() => {
         const fetchSummary = async () => {
             try {
-                const response = await fetch('/api/notifications/summary');
-                const data = await response.json();
+                const data = await api.get('/api/notifications/summary');
                 setSummary(data);
             } catch (error) {
                 console.error("Failed to fetch summary:", error);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AcknowledgeModal from '../components/AcknowledgeModal';
+import api from '../api/api';
 
 const FoodRequestsPage = () => {
   const [requests, setRequests] = useState([]);
@@ -7,8 +8,7 @@ const FoodRequestsPage = () => {
 
   const fetchRequests = useCallback(async () => {
     try {
-      const response = await fetch('/api/notifications');
-      const data = await response.json();
+      const data = await api.get('/api/notifications');
       // Filter for open food requests
       setRequests(data.filter(n => n.open && n.incidentType === 'food_request'));
     } catch (error) {

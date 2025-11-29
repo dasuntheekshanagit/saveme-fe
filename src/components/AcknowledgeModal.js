@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import api from '../api/api';
 
 const AcknowledgeModal = ({ notification, closeModal }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -7,17 +8,12 @@ const AcknowledgeModal = ({ notification, closeModal }) => {
 
   const handleVote = async (voteType) => {
     try {
-      const response = await fetch(`/api/notifications/${notification.id}/${voteType}`, {
-        method: 'POST',
-      });
-      if (response.ok) {
-        alert('Vote submitted!');
-        closeModal(); // This will trigger a refresh on the main page
-      } else {
-        alert('Failed to submit vote.');
-      }
+      await api.post(`/api/notifications/${notification.id}/${voteType}`);
+      alert('Vote submitted!');
+      closeModal();
     } catch (error) {
       console.error('Error submitting vote:', error);
+      alert('Failed to submit vote.');
     }
   };
 
@@ -27,36 +23,24 @@ const AcknowledgeModal = ({ notification, closeModal }) => {
       return;
     }
     try {
-      const response = await fetch(`/api/notifications/${notification.id}/acknowledge`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber }),
-      });
-      if (response.ok) {
-        alert('You have acknowledged this alert.');
-        setPhoneNumber('');
-        closeModal(); // This will trigger a refresh on the main page
-      } else {
-        alert('Failed to acknowledge.');
-      }
+      await api.post(`/api/notifications/${notification.id}/acknowledge`, { phoneNumber });
+      alert('You have acknowledged this alert.');
+      setPhoneNumber('');
+      closeModal();
     } catch (error) {
       console.error('Error acknowledging:', error);
+      alert('Failed to acknowledge.');
     }
   };
 
   const handleCloseAlert = async () => {
     try {
-      const response = await fetch(`/api/notifications/${notification.id}/close`, {
-        method: 'POST',
-      });
-      if (response.ok) {
-        alert('Alert closed successfully.');
-        closeModal();
-      } else {
-        alert('Failed to close alert.');
-      }
+      await api.post(`/api/notifications/${notification.id}/close`);
+      alert('Alert closed successfully.');
+      closeModal();
     } catch (error) {
       console.error('Error closing alert:', error);
+      alert('An error occurred while closing the alert.');
     }
   };
 
@@ -100,7 +84,7 @@ const AcknowledgeModal = ({ notification, closeModal }) => {
                 <h3 className="font-semibold mb-2">Photos:</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {notification.photos.map(photo => (
-                    <img key={photo.id} src={photo.url} alt="Incident" className="rounded-lg object-cover w-full h-32" />
+                    <img key={photo.id} src={`${process.env.REACT_APP_BACKEND_URL}${photo.url}`} alt="Incident" className="rounded-lg object-cover w-full h-32" />
                   ))}
                 </div>
               </div>
