@@ -3,9 +3,5 @@
   command = "npm run build"
   publish = "build"
 
-  [build.processing]
-    [build.processing.secrets]
-      omit_keys = ["REACT_APP_BACKEND_URL", "REACT_APP_GOOGLE_MAPS_API_KEY"]
-
 [runtime]
   node_version = "18"
