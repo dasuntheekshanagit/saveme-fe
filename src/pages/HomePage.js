@@ -20,11 +20,11 @@ const center = {
 const libraries = ["places"];
 
 const icons = {
-    flood: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-    landslide: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
-    traped: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
-    food_request: "http://maps.google.com/mapfiles/ms/icons/purple-dot.png",
-    other: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
+    flood: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+    landslide: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+    traped: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+    food_request: "https://maps.google.com/mapfiles/ms/icons/purple-dot.png",
+    other: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
 };
 
 const HomePage = () => {
